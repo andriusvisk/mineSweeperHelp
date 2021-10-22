@@ -18,26 +18,11 @@ public class ImageProcessing {
         Imgproc.GaussianBlur(dest, dest, new Size(5, 5), 0);
         Imgproc.adaptiveThreshold(dest, dest, 255, 1, 1, 11, 2);
 
-        dest = findContours(dest);
-
-        return dest;
-    }
-
-    public static Mat findContours(Mat src) {
         List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(src, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        Map<Integer, List<Rect>> boundingRectByArea = new HashMap<>();
+        Imgproc.findContours(dest, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        List<Rect> rectList = contours.stream().map(p -> Imgproc.boundingRect(p)).collect(Collectors.toList());
-
-        rectList = rectList.stream().filter(p -> p.area() > 20).collect(Collectors.toList());
-
-        Map<Integer, List<Rect>> mapByArea = GroupingBy.approximate(rectList, p -> (int) p.area(), 15);
-
-        //Integer[][] grid = Grid.getGrid(boundingRectByArea);
-
-        return Grid.getGrid(src, boundingRectByArea);
+        return Grid.getGrid(dest, contours);
     }
 
     public static Image mat2Image(Mat src) {
