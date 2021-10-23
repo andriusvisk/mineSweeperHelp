@@ -1,40 +1,28 @@
-import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 public class Grid {
 
-    public static Mat getGrid(Mat src, List<MatOfPoint> contours){
+    private GridCell[][] grid;
 
-        Mat result = new Mat(src.size(), CvType.CV_8UC3, new Scalar(255, 255, 255));
+    public Grid(int width, int height) {
+        grid = new GridCell[width][height];
+    }
 
-        List<Rect> rectList = contours.stream().map(p -> Imgproc.boundingRect(p)).collect(Collectors.toList());
+    public void setCell(int x, int y, GridCell gridCell) {
+        grid[x][y] = gridCell;
+    }
 
-        rectList = rectList.stream().filter(p -> p.area() > 20).collect(Collectors.toList());
-
-        Map<Integer, List<Rect>> mapByAreaSize = GroupingBy.approximate(rectList, p -> (int) p.area(), 15);
-
-        mapByAreaSize = mapByAreaSize.entrySet().stream().filter(i -> i.getValue().size() >= 4).collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
-
-        rectList = mapByAreaSize.entrySet().stream().flatMap(i -> i.getValue().stream()).collect(Collectors.toList());
-
-        Map<Integer, List<Rect>> mapByWidth = GroupingBy.approximate(rectList, p -> p.width, 15);
-
-        Map<Integer, Map<Integer, List<Rect>>> mapByWidthAndHeight = new HashMap<>();
-
-        for(Integer key: mapByWidth.keySet()){
-            Map<Integer, List<Rect>> mapByHeight = GroupingBy.approximate(mapByWidth.get(key), p -> p.height, 15);
-            mapByHeight = mapByHeight.entrySet().stream().filter(i -> i.getValue().size() >= 4).collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
-            mapByWidthAndHeight.put(key, mapByHeight);
+    public boolean isComplete() {
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                if (grid[i][j] == null)
+                    return false;
+            }
         }
+        return true;
+    }
 
-        mapByWidthAndHeight.entrySet().stream().flatMap(i->i.getValue().entrySet().stream()).flatMap(i->i.getValue().stream())
-                .forEach(i->Imgproc.rectangle(result, i, new Scalar(0, 255, 0)));
-
-
-        return result;
-
+    public GridCell[][] getGrid() {
+        return grid;
     }
 }

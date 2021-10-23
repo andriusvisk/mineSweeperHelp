@@ -8,7 +8,6 @@ import org.opencv.imgproc.Imgproc;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ImageProcessing {
 
@@ -22,7 +21,7 @@ public class ImageProcessing {
 
         Imgproc.findContours(dest, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        return Grid.getGrid(dest, contours);
+        return GridUtils.getGrid(dest, contours);
     }
 
     public static Image mat2Image(Mat src) {

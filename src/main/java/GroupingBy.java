@@ -31,5 +31,30 @@ public class GroupingBy {
         return map;
     }
 
+    public static Map<Integer, List<Rect>> byGridLines(List<Rect> list, int tolleranceInPercents) {
+
+        Map<Integer, List<Rect>> map = new HashMap<>();
+
+        for (int i = 0; i < list.size(); i++) {
+
+            final int finalI = i;
+
+            Integer closestValue = map.entrySet().stream()
+                    .map(p -> p.getKey())
+                    .min(Comparator.comparingInt(p -> Math.abs(p - list.get(finalI).y)))
+                    .orElse(-1);
+
+            if (closestValue > 0 && (double) closestValue / 100 * tolleranceInPercents >= Math.abs(closestValue - list.get(finalI).y)) {
+                map.get(closestValue).add(list.get(i));
+            } else {
+                List<T> mapValueList = new ArrayList<>();
+                mapValueList.add(list.get(i));
+                map.put(function.apply(list.get(i)), mapValueList);
+            }
+
+        }
+        return map;
+    }
+
 
 }
