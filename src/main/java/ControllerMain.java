@@ -29,7 +29,7 @@ public class ControllerMain {
 
         ImageView imageView = new ImageView();
 
-        Mat srcImage = Imgcodecs.imread("/Users/andrius/Desktop/Projektai/mineSweeperHelp/mineSweeper.png");
+        Mat srcImage = Imgcodecs.imread("/Users/agnegv/IdeaProjects/mineSweeperHelp/mineSweeper.png");
 
         ImageProcessing imageProcessing = new ImageProcessing();
 
