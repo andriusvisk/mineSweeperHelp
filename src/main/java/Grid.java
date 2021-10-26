@@ -1,25 +1,28 @@
+import org.opencv.core.Rect;
+
 import java.util.List;
 
 public class Grid {
 
     private GridCell[][] grid;
 
-    public Grid(int width, int height) {
-        grid = new GridCell[width][height];
+    public Grid(List<List<Rect>> allLines) {
+        grid = new GridCell[allLines.size()][allLines.get(0).size()];
+
+        int y = -1;
+
+        for (List<Rect> line : allLines) {
+            ++y;
+            int x = -1;
+            for (Rect cell : line) {
+                ++x;
+                grid[y][x] = new GridCell(cell);
+            }
+        }
     }
 
     public void setCell(int x, int y, GridCell gridCell) {
         grid[x][y] = gridCell;
-    }
-
-    public boolean isComplete() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                if (grid[i][j] == null)
-                    return false;
-            }
-        }
-        return true;
     }
 
     public GridCell[][] getGrid() {

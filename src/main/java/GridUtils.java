@@ -75,20 +75,58 @@ public class GridUtils {
 
             if (topLine != null) {
 
-                for(Rect rect:topLine){
-                    //check integrity
-                }
+                topLine.sort(Comparator.comparingInt(p -> p.x));
 
-                topLine.stream().forEach(i -> Imgproc.rectangle(result, i, new Scalar(0, 255, 0)));
+                if (checkLineIntegrity(topLine)) {
+                    //topLine.stream().forEach(i -> Imgproc.rectangle(result, i, new Scalar(0, 255, 0)));
+                    rects.removeAll(topLine);
+                    List<List<Rect>> allLines = getAllLines(rects, topLine, tolleranceInPercent);
+
+                    Grid grid = new Grid(allLines);
+
+                    allLines.stream().flatMap(p -> p.stream()).forEach(i -> Imgproc.rectangle(result, i, new Scalar(0, 255, 0)));
+                }
 
             }
         }
 
-        /*for (Rect rect : rects) {
-
-        }*/
-
         return null;
+    }
+
+    private static List<List<Rect>> getAllLines(List<Rect> rects, List<Rect> topLine, int tolleranceInPercent) {
+
+        List<List<Rect>> restLines = new ArrayList<>();
+        restLines.add(topLine);
+
+        while (true) {
+            List<Rect> topLineFinal = topLine;
+            List<Rect> newLine = rects.stream()
+                    .filter(
+                            p -> p.y - (topLineFinal.get(0).y + topLineFinal.get(0).height) >= 0
+                                    && p.y - (topLineFinal.get(0).y + topLineFinal.get(0).height) <= (double) topLineFinal.get(0).height / 100 * tolleranceInPercent
+                                    && p.x >= topLineFinal.get(0).x - (double) topLineFinal.get(0).width / 100 * tolleranceInPercent
+                                    && p.x + p.width <= topLineFinal.get(topLineFinal.size() - 1).x + topLineFinal.get(topLineFinal.size() - 1).width + (double) topLineFinal.get(0).width / 100 * tolleranceInPercent
+                    )
+                    .collect(Collectors.toList());
+            newLine.sort(Comparator.comparingInt(p -> p.x));
+            if (topLine.size() == newLine.size() && checkLineIntegrity(newLine)) {
+                restLines.add(newLine);
+                topLine = newLine;
+            } else {
+                return restLines;
+            }
+        }
+    }
+
+    private static boolean checkLineIntegrity(List<Rect> topLine) {
+
+        for (int i = 1; i < topLine.size(); i++) {
+            if (topLine.get(i).x < topLine.get(i - 1).x + topLine.get(i - 1).width) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
